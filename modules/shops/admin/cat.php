@@ -7,7 +7,7 @@
  * @License GNU/GPL version 2 or any later version
  * @Createdate 2-9-2010 14:43
  */
-if (! defined('NV_IS_FILE_ADMIN')) {
+if (!defined('NV_IS_FILE_ADMIN')) {
     die('Stop!!!');
 }
 
@@ -16,7 +16,6 @@ $page_title = $lang_module['cat_title'];
 $table_name = $db_config['prefix'] . '_' . $module_data . '_catalogs';
 $error = $admins = '';
 $savecat = 0;
-$data = array();
 $groups_list = nv_groups_list();
 
 if (defined('NV_EDITOR')) {
@@ -24,30 +23,28 @@ if (defined('NV_EDITOR')) {
 }
 
 $currentpath = NV_UPLOADS_DIR . '/' . $module_upload . '/' . date('Y_m');
-if (! file_exists($currentpath)) {
+if (!file_exists($currentpath)) {
     nv_mkdir(NV_UPLOADS_REAL_DIR . '/' . $module_upload, date('Y_m'), true);
 }
-
-list ($data['catid'], $data['parentid'], $data['title'], $data['title_custom'], $data['alias'], $data['description'], $data[NV_LANG_DATA . '_descriptionhtml'], $data['keywords'], $data['groups_view'], $data['cat_allow_point'], $data['cat_number_point'], $data['cat_number_product'], $data['image'], $data['form'], $data['group_price'], $data['viewdescriptionhtml'], $data['newday'], $data['typeprice']) = array(
-    0,
-    0,
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '6',
-    0,
-    0,
-    0,
-    '',
-    '',
-    $pro_config['group_price'],
-    0,
-    7,
-    1
-);
+$data = array();
+$data['catid'] = 0;
+$data['parentid'] = 0;
+$data['title'] = '';
+$data['title_custom'] = '';
+$data['alias'] = '';
+$data['description'] = '';
+$data[NV_LANG_DATA . '_descriptionhtml'] = '';
+$data['keywords'] = '';
+$data['groups_view'] = '6';
+$data['cat_allow_point'] = 0;
+$data['cat_number_point'] = 0;
+$data['cat_number_product'] = '';
+$data['image'] = '';
+$data['form'] = '';
+$data['group_price'] = $pro_config['group_price'];
+$data['viewdescriptionhtml'] = 0;
+$data['newday'] = 7;
+$data['typeprice'] = 1;
 
 $savecat = $nv_Request->get_int('savecat', 'post', 0);
 
@@ -61,7 +58,7 @@ if (is_dir(NV_ROOTDIR . '/' . NV_ASSETS_DIR . '/' . $module_upload . '/files_tpl
     }
 }
 
-if (! empty($savecat)) {
+if (!empty($savecat)) {
     $field_lang = nv_file_table($table_name);
     
     $data['catid'] = $nv_Request->get_int('catid', 'post', 0);
@@ -76,6 +73,7 @@ if (! empty($savecat)) {
     $data['description'] = nv_nl2br(nv_htmlspecialchars(strip_tags($data['description'])), '<br />');
     $data['descriptionhtml'] = $nv_Request->get_editor('descriptionhtml', '', NV_ALLOWED_HTML_TAGS);
     $data['viewdescriptionhtml'] = $nv_Request->get_int('viewdescriptionhtml', 'post', 0);
+    $data['tag_description'] = $nv_Request->get_textarea('tag_description', 'post', NV_ALLOWED_HTML_TAGS);
     $data['cat_allow_point'] = $nv_Request->get_int('cat_allow_point', 'post', 0);
     $data['cat_number_point'] = $nv_Request->get_int('cat_number_point', 'post', 0);
     $data['cat_number_product'] = $nv_Request->get_int('cat_number_product', 'post', 0);
@@ -88,7 +86,7 @@ if (! empty($savecat)) {
     }
     
     $_groups_post = $nv_Request->get_array('groups_view', 'post', array());
-    $data['groups_view'] = ! empty($_groups_post) ? implode(',', nv_groups_post(array_intersect($_groups_post, array_keys($groups_list)))) : '';
+    $data['groups_view'] = !empty($_groups_post) ? implode(',', nv_groups_post(array_intersect($_groups_post, array_keys($groups_list)))) : '';
     
     if ($data['title'] == '') {
         $error = $lang_module['error_cat_name'];
@@ -103,7 +101,7 @@ if (! empty($savecat)) {
     }
     
     $data['form'] = $nv_Request->get_title('cat_form', 'post', '');
-    if (! in_array($data['form'], $cat_form_exit)) {
+    if (!in_array($data['form'], $cat_form_exit)) {
         $data['form'] = '';
     }
     
@@ -166,7 +164,7 @@ if (! empty($savecat)) {
         }
     } elseif ($data['catid'] > 0 and $data['title'] != '' and $error == '') {
         try {
-            $stmt = $db->prepare("UPDATE " . $table_name . " SET parentid = :parentid, image = :image, typeprice = :typeprice, form = :form, group_price = :group_price, viewdescriptionhtml = :viewdescriptionhtml, " . NV_LANG_DATA . "_title= :title, " . NV_LANG_DATA . "_title_custom= :title_custom, " . NV_LANG_DATA . "_alias = :alias, " . NV_LANG_DATA . "_description= :description, " . NV_LANG_DATA . "_descriptionhtml = :descriptionhtml, " . NV_LANG_DATA . "_keywords= :keywords, groups_view= :groups_view, cat_allow_point = :cat_allow_point, cat_number_point = :cat_number_point, cat_number_product = :cat_number_product, edit_time=" . NV_CURRENTTIME . " WHERE catid =" . $data['catid']);
+            $stmt = $db->prepare("UPDATE " . $table_name . " SET parentid = :parentid, image = :image, typeprice = :typeprice, form = :form, group_price = :group_price, viewdescriptionhtml = :viewdescriptionhtml, " . NV_LANG_DATA . "_title= :title, " . NV_LANG_DATA . "_title_custom= :title_custom, " . NV_LANG_DATA . "_alias = :alias, " . NV_LANG_DATA . "_description= :description, " . NV_LANG_DATA . "_descriptionhtml = :descriptionhtml, " . NV_LANG_DATA . "_keywords= :keywords, " . NV_LANG_DATA . "_tag_description = :tag_description, groups_view= :groups_view, cat_allow_point = :cat_allow_point, cat_number_point = :cat_number_point, cat_number_product = :cat_number_product, edit_time=" . NV_CURRENTTIME . " WHERE catid =" . $data['catid']);
             $stmt->bindParam(':parentid', $data['parentid'], PDO::PARAM_INT);
             $stmt->bindParam(':title', $data['title'], PDO::PARAM_STR);
             $stmt->bindParam(':title_custom', $data['title_custom'], PDO::PARAM_STR);
@@ -175,6 +173,7 @@ if (! empty($savecat)) {
             $stmt->bindParam(':description', $data['description'], PDO::PARAM_STR);
             $stmt->bindParam(':descriptionhtml', $data['descriptionhtml'], PDO::PARAM_STR);
             $stmt->bindParam(':keywords', $data['keywords'], PDO::PARAM_STR);
+            $stmt->bindParam(':tag_description', $data['tag_description'], PDO::PARAM_STR);
             $stmt->bindParam(':typeprice', $data['typeprice'], PDO::PARAM_INT);
             $stmt->bindParam(':form', $data['form'], PDO::PARAM_STR);
             $stmt->bindParam(':group_price', $data['group_price'], PDO::PARAM_STR);
@@ -227,6 +226,7 @@ if (! empty($savecat)) {
         $data['alias'] = $data[NV_LANG_DATA . '_alias'];
         $data['description'] = $data[NV_LANG_DATA . '_description'];
         $data['keywords'] = $data[NV_LANG_DATA . '_keywords'];
+        $data['tag_description'] = $data[NV_LANG_DATA . '_tag_description'];
     }
     if ($data['parentid']) {
         $data['form'] = $db->query('SELECT form FROM ' . $table_name . ' where catid=' . $data['parentid'])->fetchColumn();
@@ -248,7 +248,7 @@ while (list ($catid_i, $title_i, $lev_i) = $result->fetch(3)) {
     $xtitle_i = '';
     if ($lev_i > 0) {
         $xtitle_i .= '&nbsp;';
-        for ($i = 1; $i <= $lev_i; $i ++) {
+        for ($i = 1; $i <= $lev_i; $i++) {
             $xtitle_i .= '---';
         }
     }
@@ -262,7 +262,7 @@ while (list ($catid_i, $title_i, $lev_i) = $result->fetch(3)) {
 $lang_global['title_suggest_max'] = sprintf($lang_global['length_suggest_max'], 65);
 $lang_global['description_suggest_max'] = sprintf($lang_global['length_suggest_max'], 160);
 
-if (! empty($data['image']) and file_exists(NV_UPLOADS_REAL_DIR . '/' . $module_upload . '/' . $data['image'])) {
+if (!empty($data['image']) and file_exists(NV_UPLOADS_REAL_DIR . '/' . $module_upload . '/' . $data['image'])) {
     $data['image'] = NV_BASE_SITEURL . NV_UPLOADS_DIR . '/' . $module_upload . '/' . $data['image'];
     $currentpath = dirname($data['image']);
 }
@@ -277,8 +277,8 @@ if ($pro_config['point_active']) {
         $data['cat_number_product_dis'] = 'readonly="readonly"';
         $data['cat_allow_point'] = '';
     }
-    $data['cat_number_point'] = ! empty($data['cat_number_point']) ? $data['cat_number_point'] : '';
-    $data['cat_number_product'] = ! empty($data['cat_number_product']) ? $data['cat_number_product'] : '';
+    $data['cat_number_point'] = !empty($data['cat_number_point']) ? $data['cat_number_point'] : '';
+    $data['cat_number_product'] = !empty($data['cat_number_product']) ? $data['cat_number_product'] : '';
 }
 
 if ($data['parentid']) {
@@ -344,7 +344,7 @@ if ($pro_config['point_active']) {
     $xtpl->parse('main.point');
 }
 
-if (! empty($cat_form_exit)) {
+if (!empty($cat_form_exit)) {
     foreach ($cat_form_exit as $_form) {
         $xtpl->assign('CAT_FORM', array(
             'value' => $_form,
@@ -364,7 +364,7 @@ if (defined('NV_EDITOR') and nv_function_exists('nv_aleditor')) {
 }
 $xtpl->assign('DESCRIPTIONHTML', $descriptionhtml);
 
-for ($i = 0; $i <= 2; $i ++) {
+for ($i = 0; $i <= 2; $i++) {
     $xtpl->assign('VIEWDESCRIPTION', array(
         'value' => $i,
         'checked' => $data['viewdescriptionhtml'] == $i ? ' checked="checked"' : '',
